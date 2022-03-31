@@ -13,7 +13,6 @@ mode = 1
 if os.environ["EMAIL"]:
     print("Login..")
 else:
-    print(os.environ["EMAIL"])
     print("Envionment hasn't been set.")
     exit()
 
