@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.9.4/dist/css/uikit.min.css" />
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.9.4/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.9.4/dist/js/uikit-icons.min.js"></script>
+    <title>ImageBoard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: black;
+        }
+        .imgbox {
+            display: grid;
+            height: 100%;
+        }
+        .center-fit {
+            max-width: 100%;
+            max-height: 100vh;
+            margin: auto;
+        }
+        img {
+            max-height:100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="uk-cover-container" uk-height-viewport>
+        <nav class="uk-navbar-container uk-dark" uk-navbar>
+            <div class="uk-navbar-left">
+                <ul class="uk-navbar-nav">
+                    <li class="uk-active"><a href="#">Another Heroine</a></li>
+                    <li class="uk-margin">
+                        <select class="uk-select" id="page">
+                            <option value="1">1</option>
+                        </select>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- <div class="imgbox">
+            <img class="center-fit" src='./images/20200229162651.jpg'>
+            <img class="center-fit" data-src="./images/20200229162651.jpg" uk-img>
+        </div> -->
+        <div class="uk-position-relative uk-visible-toggle uk-dark" tabindex="-1" uk-slideshow>
+
+            <!-- <ul class="uk-slideshow-items uk-text-center" id="imgslide">
+
+            </ul> -->
+            <div id="imgslide" class="uk-text-center">
+
+            </div>
+        
+            <!-- <a class="uk-position-center-left uk-position-small uk-hidden-hover" href="#" uk-slidenav-previous uk-slideshow-item="previous"></a>
+            <a class="uk-position-center-right uk-position-small uk-hidden-hover" href="#" uk-slidenav-next uk-slideshow-item="next"></a> -->
+            <a class="uk-position-center-left uk-position-small uk-text-large" href="#" id="left">&lt;</a>
+            <a class="uk-position-center-right uk-position-small uk-text-large" href="#" id="right">&gt;</a>
+        
+        </div>
+    </div>
+    <script>
+
+        function getCurrentPage() {
+            return (document.URL.indexOf("?page=") == -1 ? 0 : document.URL.split("?page=")[1].split("#")[0])
+        }
+        
+        function httpGet(theUrl) {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+            xmlHttp.send( null );
+            return xmlHttp.responseText;
+        }
+
+        function addImage(page) {
+            let e = document.createElement("li")
+            let img = document.createElement("img")
+            img.src = data[page];
+            e.appendChild(img);
+            document.getElementById("imgslide").appendChild(e)
+        }
+
+        function initPageNav(size) {
+            let n = document.getElementById("page");
+            n.innerHTML = "";
+            for(var i=0;i<size;i++) {
+                let option = document.createElement("option");
+                option.value = i;
+                option.innerHTML = i + 1;
+                n.appendChild(option);
+            }
+        }
+
+        function updateState(page) {
+            page = parseInt(page);
+            window.history.pushState('Page ' + (page + 1), 'Page ' + (page + 1), '/?page=' + (page + 1));
+            document.getElementById("imgslide").innerHTML = ""
+            document.getElementById("page").value = page;
+            addImage(page);
+        }
+
+        let data = httpGet("./cg.txt").split("\n")
+        let currentPage = getCurrentPage() - 1;
+        
+
+        document.getElementById("left").onclick = function(e) {
+            if(currentPage == 0)
+                currentPage = data.length - 1;
+            else
+                currentPage--;
+            updateState(currentPage);
+        }
+        document.getElementById("right").onclick = function(e) {
+            if(currentPage == data.length - 1)
+                currentPage = 0
+            else
+                currentPage++;
+            updateState(currentPage);
+        }
+
+        document.getElementById("page").onchange = function(e) {
+            currentPage = document.getElementById("page").value;
+            updateState(currentPage);
+        }
+
+        initPageNav(data.length);
+        updateState(currentPage);
+    </script>
+</body>
+</html>
